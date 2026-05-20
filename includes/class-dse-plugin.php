@@ -1,0 +1,28 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+require_once DSE_PLUGIN_PATH . 'includes/class-dse-assets.php';
+
+class DSE_Plugin
+{
+    private static ?DSE_Plugin $instance = null;
+
+    private DSE_Assets $assets;
+
+    private function __construct()
+    {
+        $this->assets = new DSE_Assets();
+    }
+
+    public static function instance(): DSE_Plugin
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+}
