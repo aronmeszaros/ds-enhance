@@ -10,6 +10,10 @@
     object-fit: cover;
 }
 
+.single-post article > .post-thumbnail:first-child {
+    display: none;
+}
+
 .post-thumbnail img {
     max-width: 100%;
     width: 100%;
@@ -20,6 +24,27 @@
 
 .entry-content > .post-thumbnail {
     margin: 0 0 32px;
+}
+
+/* CTA buttons on single posts within the article */
+
+body.single-post .entry-content .wp-block-buttons {
+    margin-bottom: 1.5rem;
+}
+
+body.single-post .wp-block-buttons .wp-block-button__link {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #0e7e8f;
+    color: #fff !important;
+    text-decoration: none;
+    border: none;
+    border-radius: 40px;
+    transition: background-color 0.3s ease;
+}
+
+body.single-post .wp-block-buttons .wp-block-button__link:hover {
+    background-color: color-mix(in srgb,#0e7e8f,#000 30.2%) !important;
 }
 
 .post-thumbnail.position-Hore  img { object-position: top;    }
