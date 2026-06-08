@@ -41,5 +41,13 @@ class DSE_Assets
             DSE_VERSION,
             true
         );
+
+        wp_enqueue_script(
+            'dse-cta-tracking',
+            DSE_PLUGIN_URL . 'assets/js/cta-tracking.js',
+            ['dse-frontend'],
+            DSE_VERSION,
+            true
+        );
     }
 }

@@ -51,6 +51,49 @@ The plugin now initializes the related-posts carousel (`.slick-carousel`) on sin
 - If Slick is already registered by theme or another plugin (`slick` or `jquery-slick`), DS Enhance reuses that handle.
 - If Slick is not loaded on the page, initialization safely skips.
 
+### 4. CTA GTM Tracking (single posts)
+The plugin automatically adds GTM attributes to article CTA button links and pushes events to `dataLayer` on click.
+
+**Supported CTA markup (example):**
+```html
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+    <div class="wp-block-button">
+        <a class="wp-block-button__link wp-element-button" href="/registracia">Sprav si test</a>
+    </div>
+</div>
+```
+
+**What it does automatically:**
+- Targets CTA links matching `a.wp-block-button__link` inside article content
+- Sets `data-gtm-event="cta_click"` when missing
+- Sets `data-gtm-name` dynamically:
+    - from a link-to-name dictionary (URL path map), or
+    - from link text, or
+    - from the URL path tail as fallback
+- Sends click event to `window.dataLayer` with payload:
+    - `event` (from `data-gtm-event`)
+    - `cta_name` (from `data-gtm-name`)
+
+**Default mapping:**
+- `/registracia` => `sprav_si_test`
+
+**How to extend mapping in WordPress (no plugin edits required):**
+```php
+add_filter('dse_cta_tracking_map', function ($map) {
+        $map['/registracia'] = 'sprav_si_test';
+        $map['/ine-kroky'] = 'ine_kroky';
+        return $map;
+});
+```
+
+**Implementation details:**
+- `includes/class-dse-cta-tracking.php`
+    - enriches rendered post content (`the_content`) with missing GTM attributes
+    - localizes runtime config (`dseCtaTracking`) for frontend JS
+- `assets/js/cta-tracking.js`
+    - annotates CTA links client-side (safety net)
+    - binds delegated click listener and pushes GTM events
+
 ---
 
 ## File Structure
@@ -63,11 +106,13 @@ ds-enhance/
 │   └── css/
 │       └── frontend.css        # All front-end styles
 │   └── js/
-│       └── frontend.js         # Carousel init + arrow controls + GA click tracking
+│       ├── frontend.js         # Carousel init + arrow controls + GA click tracking
+│       └── cta-tracking.js     # CTA GTM attribute enrichment + click tracking
 └── includes/
     ├── class-dse-plugin.php    # Singleton, hooks registration
     ├── class-dse-assets.php    # Enqueues frontend CSS/JS
-    └── class-dse-admin.php     # Admin menu page (shows this README)
+    ├── class-dse-admin.php     # Admin menu page (shows this README)
+    └── class-dse-cta-tracking.php # CTA GTM tracking integration
 ```
 
 ---
@@ -88,3 +133,6 @@ ds-enhance/
 - Frontend CSS enqueue
 - ACF-based thumbnail position class injection
 - Related-posts Slick carousel initialization with custom arrow controls
+### 1.3.0
+- Dynamically add CTA button GTM attributes and Javascript events
+- Add Styling adjustemnts to Archive page

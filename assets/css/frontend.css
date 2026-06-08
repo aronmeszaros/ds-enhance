@@ -10,6 +10,18 @@
     object-fit: cover;
 }
 
+@media (min-width: 993px) {
+    .category-posts-grid .card {
+        flex-direction: column !important;
+    }
+}
+
+@media (min-width: 993px) {
+    .category-posts-grid .card-image {
+        width: auto !important;
+    }
+}
+
 .single-post article > .post-thumbnail:first-child {
     display: none;
 }
