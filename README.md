@@ -58,7 +58,7 @@ The plugin automatically adds GTM attributes to article CTA button links and pus
 ```html
 <div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
     <div class="wp-block-button">
-        <a class="wp-block-button__link wp-element-button" href="/registracia">Sprav si test</a>
+        <a class="wp-block-button__link wp-element-button" href="/registracia">Chcem sa registrovať</a>
     </div>
 </div>
 ```
@@ -75,12 +75,12 @@ The plugin automatically adds GTM attributes to article CTA button links and pus
     - `cta_name` (from `data-gtm-name`)
 
 **Default mapping:**
-- `/registracia` => `sprav_si_test`
+- `/registracia` => `registracia`
 
 **How to extend mapping in WordPress (no plugin edits required):**
 ```php
 add_filter('dse_cta_tracking_map', function ($map) {
-        $map['/registracia'] = 'sprav_si_test';
+        $map['/registracia'] = 'registracia';
         $map['/ine-kroky'] = 'ine_kroky';
         return $map;
 });
@@ -136,3 +136,5 @@ ds-enhance/
 ### 1.3.0
 - Dynamically add CTA button GTM attributes and Javascript events
 - Add Styling adjustemnts to Archive page
+### 1.3.2
+- Adjusted min-width of containers to 700px (it was too narrow on smaller displays)

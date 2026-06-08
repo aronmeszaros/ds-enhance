@@ -31,56 +31,62 @@ class DSE_CTA_Tracking
         $dom = new DOMDocument();
         $previous_errors = libxml_use_internal_errors(true);
 
-        $wrapped_content = '<!DOCTYPE html><html><body><div id="dse-cta-root">' . $content . '</div></body></html>';
-        $loaded = $dom->loadHTML('<?xml encoding="utf-8" ?>' . $wrapped_content);
+        try {
+            $wrapped_content = '<!DOCTYPE html><html><body><div id="dse-cta-root">' . $content . '</div></body></html>';
+            $loaded = $dom->loadHTML('<?xml encoding="utf-8" ?>' . $wrapped_content);
 
-        if (!$loaded) {
-            libxml_clear_errors();
-            libxml_use_internal_errors($previous_errors);
-            return $content;
-        }
-
-        $links = $dom->getElementsByTagName('a');
-        $map = $this->get_cta_map();
-
-        foreach ($links as $link) {
-            if (!$this->is_cta_button_link($link)) {
-                continue;
+            if (!$loaded) {
+                libxml_clear_errors();
+                libxml_use_internal_errors($previous_errors);
+                return $content;
             }
 
-            if (!$link->hasAttribute('data-gtm-event')) {
-                $link->setAttribute('data-gtm-event', self::DEFAULT_EVENT_NAME);
-            }
+            $links = $dom->getElementsByTagName('a');
+            $map = $this->get_cta_map();
 
-            if (!$link->hasAttribute('data-gtm-name')) {
-                $resolved_name = $this->resolve_cta_name(
-                    $link->getAttribute('href'),
-                    $map,
-                    $link->textContent
-                );
+            foreach ($links as $link) {
+                if (!$this->is_cta_button_link($link)) {
+                    continue;
+                }
 
-                if ($resolved_name !== '') {
-                    $link->setAttribute('data-gtm-name', $resolved_name);
+                if (!$link->hasAttribute('data-gtm-event')) {
+                    $link->setAttribute('data-gtm-event', self::DEFAULT_EVENT_NAME);
+                }
+
+                if (!$link->hasAttribute('data-gtm-name')) {
+                    $resolved_name = $this->resolve_cta_name(
+                        $link->getAttribute('href'),
+                        $map,
+                        $link->textContent
+                    );
+
+                    if ($resolved_name !== '') {
+                        $link->setAttribute('data-gtm-name', $resolved_name);
+                    }
                 }
             }
-        }
 
-        $root = $dom->getElementById('dse-cta-root');
-        if (!$root) {
+            $root = $dom->getElementById('dse-cta-root');
+            if (!$root) {
+                libxml_clear_errors();
+                libxml_use_internal_errors($previous_errors);
+                return $content;
+            }
+
+            $updated_content = '';
+            foreach ($root->childNodes as $child) {
+                $updated_content .= $dom->saveHTML($child);
+            }
+
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous_errors);
+
+            return $updated_content;
+        } catch (Throwable $throwable) {
             libxml_clear_errors();
             libxml_use_internal_errors($previous_errors);
             return $content;
         }
-
-        $updated_content = '';
-        foreach ($root->childNodes as $child) {
-            $updated_content .= $dom->saveHTML($child);
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($previous_errors);
-
-        return $updated_content;
     }
 
     public function localize_frontend_config(): void
@@ -101,7 +107,7 @@ class DSE_CTA_Tracking
     private function get_cta_map(): array
     {
         $map = [
-            '/registracia' => 'sprav_si_test',
+            '/registracia' => 'registracia',
         ];
 
         $map = apply_filters('dse_cta_tracking_map', $map);

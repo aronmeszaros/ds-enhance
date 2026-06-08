@@ -1,3 +1,13 @@
+/*Hamburger icon shows only normal cursor, let it show the pointer upon hover*/
+.navbar .sidenav-trigger{
+    cursor: pointer;
+}
+
+@media only screen and (min-width: 993px) {
+    .article-wrapper .container {
+        min-width: 700px;
+    }
+}
 
 .category-posts-card-wrapper .card-image {
     overflow: hidden;

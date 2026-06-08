@@ -49,6 +49,34 @@
         };
     }
 
+    function getSafeLinkElements(selector) {
+        if (!selector || !document.querySelectorAll) {
+            return [];
+        }
+
+        try {
+            return document.querySelectorAll(selector);
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function getClosestElement(target, selector) {
+        if (!target || !selector) {
+            return null;
+        }
+
+        var element = target.nodeType === Node.ELEMENT_NODE
+            ? target
+            : target.parentElement;
+
+        if (!element || typeof element.closest !== 'function') {
+            return null;
+        }
+
+        return element.closest(selector);
+    }
+
     function resolveCtaName(el, config) {
         if (!el) {
             return '';
@@ -78,47 +106,89 @@
 
     function annotateCtaLinks() {
         var config = getCtaTrackingConfig();
+        var links = getSafeLinkElements(config.linkSelector);
 
-        document.querySelectorAll(config.linkSelector).forEach(function (link) {
-            if (!link.closest('article')) {
+        if (!links || typeof links.forEach !== 'function') {
+            return;
+        }
+
+        links.forEach(function (link) {
+            if (!link || typeof link.closest !== 'function' || !link.closest('article')) {
                 return;
             }
 
-            if (!link.dataset.gtmEvent) {
-                link.dataset.gtmEvent = config.eventName;
-            }
-
-            if (!link.dataset.gtmName) {
-                var ctaName = resolveCtaName(link, config);
-                if (ctaName) {
-                    link.dataset.gtmName = ctaName;
+            try {
+                if (!link.dataset.gtmEvent) {
+                    link.dataset.gtmEvent = config.eventName;
                 }
+
+                if (!link.dataset.gtmName) {
+                    var ctaName = resolveCtaName(link, config);
+                    if (ctaName) {
+                        link.dataset.gtmName = ctaName;
+                    }
+                }
+            } catch (error) {
+                // Never break page interaction if one CTA cannot be annotated.
             }
         });
     }
 
     function bindGtmTracking() {
-        document.removeEventListener('click', window.dseCtaClickHandler);
+        document.removeEventListener('pointerdown', window.dseCtaClickHandler, true);
+        document.removeEventListener('click', window.dseCtaClickHandler, true);
+
+        var lastTrackedHref = '';
+        var lastTrackedAt = 0;
+
+        function shouldSkipDuplicate(el) {
+            var href = el && typeof el.getAttribute === 'function'
+                ? el.getAttribute('href') || ''
+                : '';
+            var now = Date.now();
+
+            if (href === lastTrackedHref && now - lastTrackedAt < 1000) {
+                return true;
+            }
+
+            lastTrackedHref = href;
+            lastTrackedAt = now;
+            return false;
+        }
 
         window.dseCtaClickHandler = function (event) {
-            var el = event.target.closest('[data-gtm-event]');
-            if (!el) {
+            var target = event && event.target;
+            if (!target) {
                 return;
             }
 
-            var config = getCtaTrackingConfig();
-            if (!el.dataset.gtmName) {
-                el.dataset.gtmName = resolveCtaName(el, config);
+            var el = getClosestElement(target, '[data-gtm-event]');
+            if (!el || !getClosestElement(el, 'article')) {
+                return;
             }
 
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                event: el.dataset.gtmEvent,
-                cta_name: el.dataset.gtmName || ''
-            });
+            if (shouldSkipDuplicate(el)) {
+                return;
+            }
+
+            try {
+                var config = getCtaTrackingConfig();
+                if (!el.dataset.gtmName) {
+                    el.dataset.gtmName = resolveCtaName(el, config);
+                }
+
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    event: el.dataset.gtmEvent,
+                    cta_name: el.dataset.gtmName || ''
+                });
+            } catch (error) {
+                // Do not block the click if tracking fails.
+            }
         };
 
-        document.addEventListener('click', window.dseCtaClickHandler);
+        document.addEventListener('pointerdown', window.dseCtaClickHandler, true);
+        document.addEventListener('click', window.dseCtaClickHandler, true);
     }
 
     function initCtaTracking() {

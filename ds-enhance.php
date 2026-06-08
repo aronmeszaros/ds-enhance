@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DS Enhance
  * Description: Lightweight archive and single-post style enhancements for Digitalny Start.
- * Version: 1.3.0
+ * Version: 1.3.2
  * Author: Aron Meszaros
  * License: GPL-2.0-or-later
  * Text Domain: ds-enhance
@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('DSE_VERSION', '1.3.0');
+define('DSE_VERSION', '1.3.2');
 define('DSE_PLUGIN_FILE', __FILE__);
 define('DSE_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DSE_PLUGIN_URL', plugin_dir_url(__FILE__));
