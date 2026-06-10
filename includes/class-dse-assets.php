@@ -25,6 +25,13 @@ class DSE_Assets
             DSE_VERSION
         );
 
+        wp_enqueue_style(
+            'dse-cta-banner',
+            DSE_PLUGIN_URL . 'assets/css/cta-banner.css',
+            ['dse-frontend'],
+            DSE_VERSION
+        );
+
         $script_dependencies = ['jquery'];
 
         // Reuse slick handles if the active theme/plugin already registers them.
