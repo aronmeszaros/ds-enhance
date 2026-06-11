@@ -3,7 +3,7 @@
     margin: 40px 0;
     border-radius: 24px;
     overflow: hidden;
-    background: linear-gradient(120deg, #0a2630 0%, #0e3743 100%);
+    background: var(--e-global-color-primary);
 }
 
 .dse-cta-banner__inner {
@@ -20,6 +20,11 @@
     gap: 18px;
     padding: clamp(24px, 4vw, 48px);
     color: #ffffff;
+}
+
+.dse-cta-banner__content h2 {
+    color: white !important;
+    color: var( --e-global-color-d91e92b ) !important;
 }
 
 .dse-cta-banner__heading {

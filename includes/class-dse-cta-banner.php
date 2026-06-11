@@ -28,11 +28,11 @@ class DSE_CTA_Banner
         }
 
         $defaults = [
-            'heading' => 'Objav, co v tebe je',
-            'text' => 'Vypln niekolko kratkych testov zdarma a zistis, v com si dobry a kam sa mozes posunut',
+            'heading' => 'Objav, čo v tebe je',
+            'text' => 'Vyplň niekoľko krátkych testov zdarma a zistíš, v čom si dobrý a kam sa môžeš posunúť',
             'button_label' => 'Chcem sa otestovat',
             'button_url' => home_url('/jrp/ds'),
-            'image_url' => '',
+            'image_url' => 'https://digitalnystart.test.digitalnystart.sk/wp-content/uploads/2025/12/digitalny-start-mlada-zena-gesto-sebavedomia-m.webp',
             'image_alt' => 'Vyzva na otestovanie',
         ];
 
