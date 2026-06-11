@@ -45,7 +45,7 @@
         return {
             eventName: normalizeCtaName(globalConfig.eventName || 'cta_click') || 'cta_click',
             ctaMap: globalConfig.ctaMap || {},
-            linkSelector: globalConfig.linkSelector || 'a.wp-block-button__link'
+            linkSelector: globalConfig.linkSelector || 'a.wp-block-button__link, a[data-dse-cta-banner="1"]'
         };
     }
 
@@ -104,6 +104,18 @@
         return '';
     }
 
+    function isTrackableCtaLink(link) {
+        if (!link || typeof link.matches !== 'function') {
+            return false;
+        }
+
+        if (link.getAttribute('data-dse-cta-banner') === '1') {
+            return true;
+        }
+
+        return link.matches('a.wp-block-button__link') && !!link.closest('article');
+    }
+
     function annotateCtaLinks() {
         var config = getCtaTrackingConfig();
         var links = getSafeLinkElements(config.linkSelector);
@@ -113,7 +125,7 @@
         }
 
         links.forEach(function (link) {
-            if (!link || typeof link.closest !== 'function' || !link.closest('article')) {
+            if (!isTrackableCtaLink(link)) {
                 return;
             }
 
@@ -163,7 +175,7 @@
             }
 
             var el = getClosestElement(target, '[data-gtm-event]');
-            if (!el || !getClosestElement(el, 'article')) {
+            if (!isTrackableCtaLink(el)) {
                 return;
             }
 

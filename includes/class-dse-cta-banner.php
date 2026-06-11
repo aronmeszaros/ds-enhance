@@ -53,7 +53,7 @@ class DSE_CTA_Banner
                     <h2 class="dse-cta-banner__heading"><?php echo $heading; ?></h2>
                     <p class="dse-cta-banner__text"><?php echo $text; ?></p>
                     <div class="materialize-button-wrapper">
-                        <a href="<?php echo $button_url; ?>" class="materialize-button btn elevated btn-large waves-effect waves-light btn-rounded btn-dark">
+                        <a href="<?php echo $button_url; ?>" class="materialize-button btn elevated btn-large waves-effect waves-light btn-rounded btn-dark" data-dse-cta-banner="1" data-gtm-event="cta_click">
                             <span class="button-text"><?php echo $button_label; ?></span>
                         </a>
                     </div>

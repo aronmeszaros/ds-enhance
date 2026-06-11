@@ -51,8 +51,8 @@ The plugin now initializes the related-posts carousel (`.slick-carousel`) on sin
 - If Slick is already registered by theme or another plugin (`slick` or `jquery-slick`), DS Enhance reuses that handle.
 - If Slick is not loaded on the page, initialization safely skips.
 
-### 4. CTA GTM Tracking (single posts)
-The plugin automatically adds GTM attributes to article CTA button links and pushes events to `dataLayer` on click.
+### 4. CTA GTM Tracking
+The plugin automatically adds GTM attributes to selected CTA links and pushes events to `dataLayer` on click.
 
 **Supported CTA markup (example):**
 ```html
@@ -64,7 +64,9 @@ The plugin automatically adds GTM attributes to article CTA button links and pus
 ```
 
 **What it does automatically:**
-- Targets CTA links matching `a.wp-block-button__link` inside article content
+- Targets only allowlisted CTA links:
+    - article CTA links matching `a.wp-block-button__link` inside article content
+    - CTA banner links explicitly marked with `data-dse-cta-banner="1"` (tracked anywhere on site)
 - Sets `data-gtm-event="cta_click"` when missing
 - Sets `data-gtm-name` dynamically:
     - from a link-to-name dictionary (URL path map), or
@@ -76,6 +78,7 @@ The plugin automatically adds GTM attributes to article CTA button links and pus
 
 **Default mapping:**
 - `/registracia` => `registracia`
+- `/jrp/ds` => `sprav_si_test`
 
 **How to extend mapping in WordPress (no plugin edits required):**
 ```php
@@ -90,9 +93,11 @@ add_filter('dse_cta_tracking_map', function ($map) {
 - `includes/class-dse-cta-tracking.php`
     - enriches rendered post content (`the_content`) with missing GTM attributes
     - localizes runtime config (`dseCtaTracking`) for frontend JS
+- `includes/class-dse-cta-banner.php`
+    - renders CTA banner block button with explicit tracking marker `data-dse-cta-banner="1"`
 - `assets/js/cta-tracking.js`
     - annotates CTA links client-side (safety net)
-    - binds delegated click listener and pushes GTM events
+    - binds delegated click listener and pushes GTM events only for allowlisted CTA links
 
 ---
 
@@ -112,6 +117,7 @@ ds-enhance/
     ├── class-dse-plugin.php    # Singleton, hooks registration
     ├── class-dse-assets.php    # Enqueues frontend CSS/JS
     ├── class-dse-admin.php     # Admin menu page (shows this README)
+    ├── class-dse-cta-banner.php # CTA banner block render logic
     └── class-dse-cta-tracking.php # CTA GTM tracking integration
 ```
 
@@ -138,3 +144,8 @@ ds-enhance/
 - Add Styling adjustemnts to Archive page
 ### 1.3.2
 - Adjusted min-width of containers to 700px (it was too narrow on smaller displays)
+### 1.4.1
+- Added strict allowlist CTA tracking boundary:
+    - track article `wp-block-button__link` CTAs only inside article content
+    - track banner CTA buttons anywhere only when explicitly marked with `data-dse-cta-banner="1"`
+- Added default CTA mapping for `/jrp/ds` => `sprav_si_test`

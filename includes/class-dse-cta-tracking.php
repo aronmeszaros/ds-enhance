@@ -7,6 +7,9 @@ if (!defined('ABSPATH')) {
 class DSE_CTA_Tracking
 {
     private const DEFAULT_EVENT_NAME = 'cta_click';
+    private const BANNER_MARKER_ATTR = 'data-dse-cta-banner';
+    private const BANNER_MARKER_VALUE = '1';
+    private const CTA_LINK_SELECTOR = 'a.wp-block-button__link, a[data-dse-cta-banner="1"]';
 
     public function __construct()
     {
@@ -20,7 +23,7 @@ class DSE_CTA_Tracking
             return $content;
         }
 
-        if (stripos($content, 'wp-block-button__link') === false) {
+        if (!$this->contains_trackable_cta_markup($content)) {
             return $content;
         }
 
@@ -99,7 +102,7 @@ class DSE_CTA_Tracking
             [
                 'eventName' => self::DEFAULT_EVENT_NAME,
                 'ctaMap' => $map,
-                'linkSelector' => 'a.wp-block-button__link',
+                'linkSelector' => self::CTA_LINK_SELECTOR,
             ]
         );
     }
@@ -108,6 +111,7 @@ class DSE_CTA_Tracking
     {
         $map = [
             '/registracia' => 'registracia',
+            '/jrp/ds' => 'sprav_si_test',
         ];
 
         $map = apply_filters('dse_cta_tracking_map', $map);
@@ -138,7 +142,27 @@ class DSE_CTA_Tracking
     private function is_cta_button_link(DOMElement $link): bool
     {
         $class_names = $link->getAttribute('class');
-        return stripos($class_names, 'wp-block-button__link') !== false;
+        $is_article_cta = stripos($class_names, 'wp-block-button__link') !== false;
+
+        return $is_article_cta || $this->has_banner_marker($link);
+    }
+
+    private function contains_trackable_cta_markup(string $content): bool
+    {
+        if (stripos($content, 'wp-block-button__link') !== false) {
+            return true;
+        }
+
+        if (stripos($content, self::BANNER_MARKER_ATTR . '="' . self::BANNER_MARKER_VALUE . '"') !== false) {
+            return true;
+        }
+
+        return stripos($content, self::BANNER_MARKER_ATTR . "='" . self::BANNER_MARKER_VALUE . "'") !== false;
+    }
+
+    private function has_banner_marker(DOMElement $link): bool
+    {
+        return $link->getAttribute(self::BANNER_MARKER_ATTR) === self::BANNER_MARKER_VALUE;
     }
 
     private function resolve_cta_name(string $href, array $map, string $text): string
