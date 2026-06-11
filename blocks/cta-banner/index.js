@@ -23,7 +23,7 @@
                 el(
                     'p',
                     { style: { marginTop: '8px', marginBottom: 0 } },
-                    __('This block renders the DS CTA banner on the frontend.', 'ds-enhance')
+                    __('Tento blok zobrazí CTA banner na frontende. Ulož článok, a pozri si výsledok na stránke.', 'ds-enhance')
                 )
             );
         },
